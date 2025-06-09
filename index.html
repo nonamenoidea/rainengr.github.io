@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排课系统 | 需求分析与设计文档</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #2ecc71;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--secondary);
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* 头部样式 */
+        header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary-dark));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            margin-right: 10px;
+            color: var(--success);
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        nav ul li a:hover, 
+        nav ul li a.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: var(--success);
+            transition: var(--transition);
+        }
+
+        nav ul li a:hover::after,
+        nav ul li a.active::after {
+            width: 100%;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.9)), url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center/cover;
+            color: white;
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .hero-content h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--success);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            background-color: #27ae60;
+        }
+
+        /* 文档导航 */
+        .docs-nav {
+            background-color: var(--light);
+            padding: 2rem 0;
+            position: sticky;
+            top: 75px;
+            z-index: 900;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-icon {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            font-size: 2.5rem;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .card-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .card-content ul {
+            text-align: left;
+            list-style-type: none;
+            margin-top: 1rem;
+        }
+
+        .card-content ul li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-content ul li:before {
+            content: "•";
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        /* 文档内容区 */
+        .doc-section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            display: inline-block;
+            padding-bottom: 1rem;
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary);
+        }
+
+        .doc-content {
+            background: white;
+            border-radius: 8px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .doc-content h3 {
+            color: var(--primary);
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .doc-content p {
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .feature-card h4 {
+            color: var(--primary-dark);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-card h4 i {
+            margin-right: 0.8rem;
+            color: var(--success);
+        }
+
+        /* 图表展示 */
+        .diagram-container {
+            margin: 2rem 0;
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .diagram {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .diagram:hover {
+            transform: scale(1.02);
+        }
+
+        /* 团队展示 */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .team-member {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .member-img {
+            height: 180px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 4rem;
+        }
+
+        .member-info {
+            padding: 1.5rem;
+        }
+
+        .member-info h4 {
+            font-size: 1.4rem;
+            color: var(--primary-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .member-info p {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .member-contribution {
+            margin-top: 1rem;
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        /* 页脚 */
+        footer {
+            background: var(--secondary);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--success);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-links a:hover {
+            color: var(--success);
+            transform: translateX(5px);
+        }
+
+        .footer-links a i {
+            margin-right: 0.5rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* 暗色模式 */
+        body.dark-mode {
+            background-color: #1a1a2e;
+            color: #e6e6e6;
+        }
+
+        body.dark-mode .doc-content,
+        body.dark-mode .nav-card,
+        body.dark-mode .feature-card,
+        body.dark-mode .team-member,
+        body.dark-mode .diagram-container {
+            background-color: #16213e;
+            color: #e6e6e6;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .card-content h3,
+        body.dark-mode .section-title h2,
+        body.dark-mode .feature-card h4 {
+            color: #4cc9f0;
+        }
+
+        body.dark-mode .doc-content h3 {
+            color: #4361ee;
+        }
+
+        body.dark-mode .feature-card {
+            background-color: #1a1a2e;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .logo {
+                margin-bottom: 1rem;
+                justify-content: center;
+            }
+            
+            nav ul {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+            
+            nav ul li {
+                margin: 0 0.5rem;
+            }
+            
+            .hero-content h2 {
+                font-size: 2.2rem;
+            }
+            
+            .hero-content p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .doc-content {
+                padding: 1.5rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 0.3rem;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <!-- 头部导航 -->
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-calendar-alt"></i>
+
+                <h1>智能排课系统</h1>
+
+            </div>
+
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">首页</a>
+</li>
+
+                    <li><a href="#requirements">需求分析</a>
+</li>
+
+                    <li><a href="#design">系统设计</a>
+</li>
+
+                    <li><a href="#diagrams">设计图表</a>
+</li>
+
+                    <li><a href="#team">项目团队</a>
+</li>
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container hero-content">
+            <h2>智能排课系统需求分析与设计文档</h2>
+
+            <p>本系统旨在解决传统人工排课的痛点，通过智能算法实现高效、无冲突的课程安排，优化教学资源配置，提升教务管理效率。</p>
+
+            <a href="#requirements" class="btn">查看文档 <i class="fas fa-arrow-down"></i>
+</a>
+
+        </div>
+
+    </section>
+
+
+    <!-- 文档导航 -->
+    <section class="docs-nav">
+        <div class="container">
+            <div class="nav-cards">
+                <div class="nav-card">
+                    <div class="card-icon">
+                        <i class="fas fa-file-alt"></i>
+
+                    </div>
+
+                    <div class="card-content">
+                        <h3>需求分析</h3>
+
+                        <p>系统功能需求与用户分析</p>
+
+                        <ul>
+                            <li>用户管理模块</li>
+
+                            <li>基础数据管理</li>
+
+                            <li>排课规则设置</li>
+
+                            <li>系统维护需求</li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                
+                <div class="nav-card">
+                    <div class="card-icon">
+                        <i class="fas fa-project-diagram"></i>
+
+                    </div>
+
+                    <div class="card-content">
+                        <h3>系统设计</h3>
+
+                        <p>架构与技术实现方案</p>
+
+                        <ul>
+                            <li>系统架构设计</li>
+
+                            <li>数据库设计</li>
+
+                            <li>排课算法设计</li>
+
+                            <li>接口设计</li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                
+                <div class="nav-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+
+                    </div>
+
+                    <div class="card-content">
+                        <h3>设计图表</h3>
+
+                        <p>UML与系统流程图</p>
+
+                        <ul>
+                            <li>用例图</li>
+
+                            <li>类图</li>
+
+                            <li>序列图</li>
+
+                            <li>数据流图</li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- 需求分析部分 -->
+    <section id="requirements" class="doc-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>需求分析文档</h2>
+
+            </div>
+
+            
+            <div class="doc-content">
+                <h3>项目背景</h3>
+
+                <p>当前许多院校的排课工作仍依赖人工或半自动化的Excel表格进行，效率低下、易出错，且难以应对复杂的排课约束和动态调整需求。本项目旨在开发一套现代化的排课信息系统。</p>
+
+                
+                <h3>项目目标</h3>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-bolt"></i>
+ 提高排课效率</h4>
+
+                        <p>大幅缩短排课周期，减轻教务管理员的工作负担。通过自动化处理，将排课时间从数周缩短至数分钟。</p>
+
+                    </div>
+
+                    
+                    <div class="feature-card">
+                        <h4><i class="fas fa-ban"></i>
+ 减少课程冲突</h4>
+
+                        <p>通过智能算法和规则校验，最大限度地避免时间、地点、教师等资源冲突。</p>
+
+                    </div>
+
+                    
+                    <div class="feature-card">
+                        <h4><i class="fas fa-building"></i>
+ 优化资源利用</h4>
+
+                        <p>合理分配教室、实验室、自习室等教学资源，提高其使用率。</p>
+
+                    </div>
+
+                </div>
+
+                
+                <h3>功能需求</h3>
+
+                <h4>用户管理模块</h4>
+
+                <ul>
+                    <li>支持创建不同角色的用户账号(教师、学生)</li>
+
+                    <li>用户通过学号/工号和密码登录系统</li>
+
+                    <li>提供密码找回/重置功能</li>
+
+                    <li>为不同角色分配不同的操作权限</li>
+
+                </ul>
+
+                
+                <h4>基础数据管理</h4>
+
+                <ul>
+                    <li>教室信息管理：教室编号、容量、类型</li>
+
+                    <li>教师信息管理：工号、姓名、职称、禁排时间</li>
+
+                    <li>课程信息管理：课程编号、名称、学分、类型</li>
+
+                    <li>专业/班级信息管理：专业代码、专业名称、人数</li>
+
+                </ul>
+
+                
+                <h4>排课规则设置</h4>
+
+                <ul>
+                    <li>时间规则：午休/节假日禁排、连排课时限制</li>
+
+                    <li>教师规则：每日/周最大课时数、避免连续上课</li>
+
+                    <li>教室规则：特定课程安排在特定类型教室</li>
+
+                    <li>课程规则：互斥课程不能安排在同一天</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    
+    <!-- 系统设计部分 -->
+    <section id="design" class="doc-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>系统设计文档</h2>
+
+            </div>
+
+            
+            <div class="doc-content">
+                <h3>系统架构</h3>
+
+                <p></p>
+
+                
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h4><i class="fas fa-layer-group"></i>
+ 前端架构</h4>
+
+                        <p></p>
+
+                    </div>
+
+                    
+                    <div class="feature-card">
+                        <h4><i class="fas fa-server"></i>
+ 后端架构</h4>
+
+                        <p></p>
+
+                    </div>
+
+                    
+                    <div class="feature-card">
+                        <h4><i class="fas fa-brain"></i>
+ 排课引擎</h4>
+
+                        <p></p>
+
+                    </div>
+
+                </div>
+
+                
+                <h3>核心模块设计</h3>
+
+                <h4>排课算法流程</h4>
+
+                <ol>
+                    <li>初始化：读取所有课程、教师、教室数据</li>
+
+                    <li>约束条件处理：应用所有排课规则</li>
+
+                    <li>资源分配：使用贪心算法进行初始分配</li>
+
+                    <li>冲突检测与优化：遗传算法优化资源分配</li>
+
+                    <li>结果输出：生成无冲突课表</li>
+
+                </ol>
+
+                
+                <h4>数据库设计</h4>
+
+                <p>主要数据库表包括：用户表、课程表、教师表、教室表、班级表、课表表、权限表等。</p>
+
+                
+                <h4>接口设计</h4>
+
+                <ul>
+                    <li>用户认证接口：登录、注册、权限验证</li>
+
+                    <li>数据管理接口：CRUD操作接口</li>
+
+                    <li>排课接口：排课规则设置、排课执行、结果查询</li>
+
+                    <li>查询接口：课表查询、资源查询</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    
+    <!-- 设计图表部分 -->
+    <section id="diagrams" class="doc-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>设计图表</h2>
+
+            </div>
+
+            
+            <div class="doc-content">
+                <h3>系统用例图</h3>
+
+                <div class="diagram-container">
+                    
+[](@replace=1)
+
+                </div>
+
+                
+                <h3>系统类图</h3>
+
+                <div class="diagram-container">
+                    
+[](@replace=2)
+
+                </div>
+
+                
+                <h3>系统序列图</h3>
+
+                <div class="diagram-container">
+                    
+[](@replace=3)
+
+                </div>
+
+                
+                <h3>数据流图</h3>
+
+                <div class="diagram-container">
+                    
+[](@replace=4)
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    
+    <!-- 项目团队部分 -->
+    <section id="team" class="doc-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>项目团队</h2>
+
+            </div>
+
+            
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-img">
+                        <i class="fas fa-user"></i>
+
+                    </div>
+
+                    <div class="member-info">
+                        <h4>蔡雨坤</h4>
+
+                        <p>前端开发</p>
+
+                        <div class="member-contribution">
+                            <strong>贡献: 40%</strong>
+
+                            <p>用户界面设计、前端功能实现、交互优化</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                
+                <div class="team-member">
+                    <div class="member-img">
+                        <i class="fas fa-user"></i>
+
+                    </div>
+
+                    <div class="member-info">
+                        <h4>张凯</h4>
+
+                        <p>后端开发</p>
+
+                        <div class="member-contribution">
+                            <strong>贡献: 30%</strong>
+
+                            <p>系统架构设计、算法实现、数据库设计</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                
+                <div class="team-member">
+                    <div class="member-img">
+                        <i class="fas fa-user"></i>
+
+                    </div>
+
+                    <div class="member-info">
+                        <h4>关荣升</h4>
+
+                        <p>系统测试</p>
+
+                        <div class="member-contribution">
+                            <strong>贡献: 30%</strong>
+
+                            <p>系统各功能检验、需求分析</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>关于项目</h3>
+
+                    <p>智能排课系统是为教育机构设计的现代化教务管理工具，旨在通过技术创新解决传统排课的痛点，提升教育资源利用效率。</p>
+
+                </div>
+
+                
+                <div class="footer-column">
+                                       <h3>相关文档</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-file-pdf"></i> 需求分析文档</a></li>
+                        <li><a href="#"><i class="fas fa-file-pdf"></i> 系统设计文档</a></li>
+                        <li><a href="#"><i class="fas fa-file-pdf"></i> 用户手册</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>项目资源</h3>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fab fa-github"></i> GitHub仓库</a></li>
+                        <li><a href="#"><i class="fas fa-code"></i> API文档</a></li>
+                        <li><a href="#"><i class="fas fa-server"></i> 部署指南</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 智能排课系统项目组 | 软件工程课程设计</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 暗色模式切换 -->
+    <button id="dark-mode-toggle" class="btn" style="position: fixed; bottom: 20px; right: 20px; z-index: 999;">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        // 暗色模式切换
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const body = document.body;
+        
+        // 检查本地存储中是否保存了暗色模式设置
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-theme');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-theme');
+            
+            if (body.classList.contains('dark-theme')) {
+                localStorage.setItem('darkMode', 'enabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                localStorage.setItem('darkMode', 'disabled');
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+        
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 70,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 图表交互
+        document.querySelectorAll('.diagram').forEach(diagram => {
+            diagram.addEventListener('click', function() {
+                this.classList.toggle('zoomed');
+            });
+        });
+        
+        // 导航激活状态
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.doc-section');
+            const navLinks = document.querySelectorAll('nav ul li a');
+            
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${currentSection}`) {
+                    link.classList.add('active');
+                } else if (currentSection === '' && link.getAttribute('href') === '#') {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
