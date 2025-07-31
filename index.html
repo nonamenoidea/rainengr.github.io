@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>八一建军节致敬</title>
+    <title>守护者</title>
     <style>
         * {
             margin: 0;
@@ -13,60 +13,38 @@
         
         body {
             font-family: 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0c192d, #1f3551);
+            background: linear-gradient(135deg, #2a5a8c, #3d7cb1);
             min-height: 100vh;
             overflow: hidden;
             position: relative;
+            color: #fff;
         }
         
-        /* 军旗效果 */
-        .flag {
+        /* 军旗容器 */
+        .flag-container {
             position: absolute;
             top: 10%;
             left: 5%;
             width: 90%;
             height: 25%;
-            background: linear-gradient(to right, #c62f2f 40%, #ffde7d 40%, #ffde7d 60%, #c62f2f 60%);
+            perspective: 600px;
+            z-index: 5;
+        }
+        
+        /* 军旗图片位置 - 请在此处插入您的军旗图片 */
+        .flag-image {
+            width: 100%;
+            height: 100%;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            animation: wave 3s infinite linear;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            animation: float 4s infinite ease-in-out;
+            background-size: cover;
+            background-position: center;
         }
         
-        @keyframes wave {
-            0%, 100% { transform: skewX(0deg); }
-            50% { transform: skewX(5deg); }
-        }
-        
-        /* 主祝福区 */
-        .content {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: #fff;
-            z-index: 10;
-            width: 90%;
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .btn {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 30px;
-            background: linear-gradient(to right, #d4af37, #f0c75e);
-            color: #1f3551;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: none;
-            font-size: 1.1rem;
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(1deg); }
+            50% { transform: translateY(-10px) rotate(-1deg); }
         }
         
         /* 五角星雨 */
@@ -76,12 +54,74 @@
             font-size: 1.5rem;
             animation: fall 8s linear infinite;
             user-select: none;
-            text-shadow: 0 0 5px rgba(255, 222, 125, 0.7);
+            text-shadow: 0 0 8px rgba(255, 222, 125, 0.7);
+            z-index: 2;
         }
         
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        /* 主内容区 */
+        .content {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 10;
+            width: 90%;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            animation: heartbeat 1.5s infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .message {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin-top: 20px;
+            padding: 0 15px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 14px 40px;
+            background: linear-gradient(to right, #e9c46a, #f4a261);
+            color: #1d3557;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(233, 196, 106, 0.4);
+            font-size: 1.3rem;
+            border: none;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(233, 196, 106, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(233, 196, 106, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(233, 196, 106, 0); }
+        }
+        
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(233, 196, 106, 0.6);
         }
         
         /* 烟花画布 */
@@ -94,18 +134,42 @@
             pointer-events: none;
             z-index: 20;
         }
+        
+        /* 隐藏的心意 */
+        .hidden-message {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 1.5s;
+            color: rgba(255, 255, 255, 0.9);
+        }
     </style>
 </head>
 <body>
-    <!-- 军旗元素 -->
-    <div class="flag"></div>
+    <!-- 军旗容器 - 请在此处插入您的军旗图片 -->
+    <div class="flag-container">
+        <div class="flag-image" id="flagImage">
+            <!-- 
+                请在此处插入中国人民解放军军旗图片
+                示例：<img src="your_flag_image.jpg" alt="军旗" style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
+            -->
+            <img src="./images/flag.jpeg" alt="军旗" style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
+        </div>
+    </div>
     
     <!-- 祝福内容 -->
     <div class="content">
-        <h1>致敬最可爱的人</h1>
-        <p>钢铁意志铸就和平盾牌<br>热血忠诚守护万家灯火</p>
-        <button class="btn" id="fireBtn">点击致敬</button>
+        <h1>守护者</h1>
+        <p class="message">钢铁意志守护山河<br>赤诚之心温暖岁月</p>
+        <button class="btn" id="fireBtn">点亮祝福</button>
     </div>
+    
+    <!-- 隐藏的心意 -->
+    <div class="hidden-message" id="hiddenMessage">有些守护，无需言语</div>
     
     <!-- 烟花画布 -->
     <canvas id="fireworks"></canvas>
@@ -113,64 +177,103 @@
     <script>
         // 创建五角星雨
         function createStars() {
-            for (let i = 0; i < 20; i++) {
+            const starsNum = 25;
+            for (let i = 0; i < starsNum; i++) {
                 const star = document.createElement('div');
                 star.innerHTML = '★';
                 star.classList.add('star');
+                
+                // 随机位置和动画
                 star.style.left = Math.random() * 100 + 'vw';
                 star.style.animationDelay = Math.random() * 5 + 's';
+                star.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                star.style.fontSize = (Math.random() * 0.8 + 1.2) + 'rem';
+                star.style.opacity = Math.random() * 0.7 + 0.3;
+                
                 document.body.appendChild(star);
             }
         }
         
-        // 烟花特效
+        // 含蓄心形烟花特效
         function initFireworks() {
             const canvas = document.getElementById('fireworks');
             const ctx = canvas.getContext('2d');
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             
-            // 烟花发射函数
             return function() {
+                // 闪光效果
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // 烟花粒子
                 const particles = [];
-                const particleCount = 80;
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const particleCount = 120;
                 
                 for (let i = 0; i < particleCount; i++) {
+                    // 使用心形参数方程生成粒子位置
+                    const t = Math.random() * Math.PI * 2;
+                    const scale = 10 + Math.random() * 5;
+                    const x = scale * 16 * Math.pow(Math.sin(t), 3);
+                    const y = -scale * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+                    
+                    // 添加随机偏移使心形更含蓄
+                    const offsetX = (Math.random() - 0.5) * 30;
+                    const offsetY = (Math.random() - 0.5) * 30;
+                    
                     particles.push({
-                        x: canvas.width / 2,
-                        y: canvas.height / 2,
-                        color: `hsl(${Math.random() * 60 + 20}, 100%, 60%)`,
-                        radius: Math.random() * 2 + 1,
-                        speed: Math.random() * 5 + 2,
-                        angle: Math.random() * Math.PI * 2,
-                        friction: 0.92
+                        startX: centerX,
+                        startY: centerY,
+                        targetX: centerX + x + offsetX,
+                        targetY: centerY + y + offsetY,
+                        x: centerX,
+                        y: centerY,
+                        color: `hsla(${Math.random() * 60 + 330}, 80%, 70%, 0.7)`, // 更柔和的粉色
+                        size: Math.random() * 1.5 + 0.8,
+                        speed: Math.random() * 1.2 + 0.8,
+                        life: 120 + Math.random() * 60
                     });
                 }
                 
-                // 动画循环
                 function animate() {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     
-                    for (let i = particles.length - 1; i >= 0; i--) {
-                        const p = particles[i];
-                        p.x += Math.cos(p.angle) * p.speed;
-                        p.y += Math.sin(p.angle) * p.speed;
-                        p.speed *= p.friction;
-                        p.radius -= 0.05;
+                    let activeParticles = false;
+                    
+                    particles.forEach(p => {
+                        // 计算粒子到目标点的方向
+                        const dx = p.targetX - p.x;
+                        const dy = p.targetY - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
                         
+                        if (distance > 1) {
+                            // 向目标点移动
+                            p.x += (dx / distance) * p.speed;
+                            p.y += (dy / distance) * p.speed;
+                            activeParticles = true;
+                        } else {
+                            // 到达目标点后随机飘动
+                            p.x += (Math.random() - 0.5) * 2;
+                            p.y += (Math.random() - 0.5) * 2;
+                            p.life -= 1;
+                            if (p.life > 0) activeParticles = true;
+                        }
+                        
+                        // 绘制粒子
                         ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                         ctx.fillStyle = p.color;
                         ctx.fill();
-                        
-                        if (p.radius <= 0.1) {
-                            particles.splice(i, 1);
-                        }
-                    }
+                    });
                     
-                    if (particles.length > 0) {
+                    if (activeParticles) {
                         requestAnimationFrame(animate);
+                    } else {
+                        // 烟花结束后显示隐藏信息
+                        document.getElementById('hiddenMessage').style.opacity = 1;
                     }
                 }
                 
@@ -184,7 +287,27 @@
             const launchFirework = initFireworks();
             
             // 按钮点击事件
-            document.getElementById('fireBtn').addEventListener('click', launchFirework);
+            const fireBtn = document.getElementById('fireBtn');
+            fireBtn.addEventListener('click', function() {
+                this.textContent = "祝福已送达";
+                this.style.background = "linear-gradient(to right, #e76f51, #f4a261)";
+                launchFirework();
+            });
+            
+            // 添加触摸事件支持
+            fireBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                this.click();
+            });
+        });
+        
+        // 响应窗口大小变化
+        window.addEventListener('resize', function() {
+            const canvas = document.getElementById('fireworks');
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
         });
     </script>
 </body>
