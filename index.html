@@ -31,7 +31,7 @@
             z-index: 5;
         }
         
-        /* 军旗图片位置 - 请在此处插入您的军旗图片 */
+        /* 军旗图片位置 */
         .flag-image {
             width: 100%;
             height: 100%;
@@ -134,6 +134,29 @@
             pointer-events: none;
             z-index: 20;
         }
+        /* 节日快乐大字 */
+        .festival-greeting {
+            position: absolute;
+            bottom: 20%;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #ffde7d;
+            text-shadow: 0 0 20px rgba(255, 222, 125, 0.8),
+                         0 0 40px rgba(255, 222, 125, 0.6),
+                         0 0 60px rgba(255, 222, 125, 0.4);
+            opacity: 0;
+            transition: opacity 1s;
+            z-index: 25;
+            animation: greeting-pulse 2s infinite alternate;
+        }
+        
+        @keyframes greeting-pulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 222, 125, 0.8); }
+            100% { transform: scale(1.05); text-shadow: 0 0 30px rgba(255, 222, 125, 1); }
+        }
         
         /* 隐藏的心意 */
         .hidden-message {
@@ -154,19 +177,23 @@
     <div class="flag-container">
         <div class="flag-image" id="flagImage">
             <!-- 
-                请在此处插入中国人民解放军军旗图片
-                示例：<img src="your_flag_image.jpg" alt="军旗" style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
+                请将下面的图片路径替换为您的图片路径
+                示例：<img src="your_flag_image.jpg" alt="旗" style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
             -->
-            <img src="./images/flag.jpeg" alt="军旗" style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
+            <img src="./images/flag.jpeg" alt="旗帜" 
+                 style="width:100%; height:100%; object-fit: cover; border-radius:8px;">
         </div>
     </div>
     
     <!-- 祝福内容 -->
     <div class="content">
-        <h1>守护者</h1>
+        <h1>致雨欣</h1>
         <p class="message">钢铁意志守护山河<br>赤诚之心温暖岁月</p>
         <button class="btn" id="fireBtn">点亮祝福</button>
     </div>
+
+    <!-- 节日快乐大字 -->
+    <div class="festival-greeting" id="festivalGreeting">节日快乐！</div>
     
     <!-- 隐藏的心意 -->
     <div class="hidden-message" id="hiddenMessage">有些守护，无需言语</div>
@@ -219,9 +246,13 @@
                     const x = scale * 16 * Math.pow(Math.sin(t), 3);
                     const y = -scale * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
                     
-                    // 添加随机偏移使心形更含蓄
-                    const offsetX = (Math.random() - 0.5) * 30;
-                    const offsetY = (Math.random() - 0.5) * 30;
+                    // 增加随机偏移使心形更含蓄
+                    const offsetX = (Math.random() - 0.5) * 50; // 增加偏移范围
+                    const offsetY = (Math.random() - 0.5) * 50;
+                    
+                    // 随机粒子大小和透明度
+                    const size = Math.random() * 1.3 + 0.7; // 减小粒子大小
+                    const alpha = Math.random() * 0.3 + 0.3; // 降低透明度
                     
                     particles.push({
                         startX: centerX,
@@ -230,19 +261,21 @@
                         targetY: centerY + y + offsetY,
                         x: centerX,
                         y: centerY,
-                        color: `hsla(${Math.random() * 60 + 330}, 80%, 70%, 0.7)`, // 更柔和的粉色
-                        size: Math.random() * 1.5 + 0.8,
-                        speed: Math.random() * 1.2 + 0.8,
-                        life: 120 + Math.random() * 60
+                        color: `hsla(${Math.random() * 60 + 330}, 70%, 70%, ${alpha})`, // 更柔和的粉色
+                        size: size,
+                        speed: Math.random() * 0.8 + 0.5, // 降低速度
+                        life: 160 + Math.random() * 80, // 延长生命周期
+                        drift: Math.random() * 0.2 + 0.1 // 漂移系数
                     });
                 }
                 
                 function animate() {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.07)';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)'; // 增加背景透明度
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     
                     let activeParticles = false;
                     
+                    // 绘制心形粒子
                     particles.forEach(p => {
                         // 计算粒子到目标点的方向
                         const dx = p.targetX - p.x;
@@ -256,16 +289,25 @@
                             activeParticles = true;
                         } else {
                             // 到达目标点后随机飘动
-                            p.x += (Math.random() - 0.5) * 2;
-                            p.y += (Math.random() - 0.5) * 2;
+                            p.x += (Math.random() - 0.5) * 5 * p.drift; // 增加随机移动幅度
+                            p.y += (Math.random() - 0.5) * 5 * p.drift;
                             p.life -= 1;
                             if (p.life > 0) activeParticles = true;
                         }
                         
-                        // 绘制粒子
+                        // 绘制粒子 - 使用模糊效果
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                        ctx.fillStyle = p.color;
+                        
+                        // 创建模糊效果
+                        const gradient = ctx.createRadialGradient(
+                            p.x, p.y, 0,
+                            p.x, p.y, p.size * 2
+                        );
+                        gradient.addColorStop(0, p.color);
+                        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                        
+                        ctx.fillStyle = gradient;
                         ctx.fill();
                     });
                     
