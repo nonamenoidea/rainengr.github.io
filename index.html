@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>守护者</title>
+    <title>祝亲爱的雨欣同志</title>
     <style>
         * {
             margin: 0;
@@ -23,10 +23,10 @@
         /* 军旗容器 */
         .flag-container {
             position: absolute;
-            top: 10%;
+            top: 4%;
             left: 34%;
             width: 32%;
-            height: 25%;
+            height: 34%;
             perspective: 600px;
             z-index: 5;
         }
@@ -134,6 +134,18 @@
             pointer-events: none;
             z-index: 20;
         }
+        
+        /* 背景烟花画布 */
+        #backgroundFireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 15;
+        }
+        
         /* 节日快乐大字 */
         .festival-greeting {
             position: absolute;
@@ -198,8 +210,11 @@
     <!-- 隐藏的心意 -->
     <div class="hidden-message" id="hiddenMessage">有些守护，无需言语</div>
     
-    <!-- 烟花画布 -->
+    <!-- 主要烟花画布 -->
     <canvas id="fireworks"></canvas>
+    
+    <!-- 背景烟花画布 -->
+    <canvas id="backgroundFireworks"></canvas>
     
     <script>
         // 创建五角星雨
@@ -221,7 +236,94 @@
             }
         }
         
-        // 含蓄心形烟花特效
+        // 创建背景烟花特效
+        function initBackgroundFireworks() {
+            const canvas = document.getElementById('backgroundFireworks');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            let animationId = null;
+            
+            // 创建小烟花粒子
+            function createSmallFirework() {
+                const centerX = Math.random() * canvas.width;
+                const centerY = Math.random() * canvas.height;
+                const particleCount = Math.floor(Math.random() * 30) + 20; // 20-50个粒子
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 1.5 + 0.5;
+                    const size = Math.random() * 1.5 + 0.5;
+                    const color = `hsla(${Math.random() * 360}, 70%, 70%, ${Math.random() * 0.5 + 0.3})`;
+                    
+                    particles.push({
+                        x: centerX,
+                        y: centerY,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: size,
+                        color: color,
+                        life: Math.random() * 60 + 40, // 40-100帧生命周期
+                        gravity: 0.02,
+                        friction: 0.95
+                    });
+                }
+            }
+            
+            // 动画循环
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 随机添加新烟花
+                if (Math.random() < 0.05) {
+                    createSmallFirework();
+                }
+                
+                // 更新和绘制粒子
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    
+                    // 更新位置
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += p.gravity;
+                    
+                    // 应用摩擦力
+                    p.vx *= p.friction;
+                    p.vy *= p.friction;
+                    
+                    // 减少生命周期
+                    p.life--;
+                    
+                    // 绘制粒子
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    
+                    // 移除消失的粒子
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                    }
+                }
+                
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // 开始动画
+            animate();
+            
+            // 返回停止函数
+            return function() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            };
+        }
+        
+        // 创建心形烟花特效
         function initFireworks() {
             const canvas = document.getElementById('fireworks');
             const ctx = canvas.getContext('2d');
@@ -277,6 +379,7 @@
                     
                     let activeParticles = false;
                     
+                    
                     // 绘制心形粒子
                     particles.forEach(p => {
                         // 计算粒子到目标点的方向
@@ -329,13 +432,33 @@
         window.addEventListener('load', function() {
             createStars();
             const launchFirework = initFireworks();
+            const startBackgroundFireworks = initBackgroundFireworks();
+            
+            // 自动触发定时器变量
+            let autoFireInterval = null;
+            let backgroundFireworksActive = false;
             
             // 按钮点击事件
             const fireBtn = document.getElementById('fireBtn');
             fireBtn.addEventListener('click', function() {
                 this.textContent = "祝福已送达";
                 this.style.background = "linear-gradient(to right, #e76f51, #f4a261)";
+                
+                // 触发第一次烟花
                 launchFirework();
+                
+                // 启动背景烟花
+                if (!backgroundFireworksActive) {
+                    startBackgroundFireworks();
+                    backgroundFireworksActive = true;
+                }
+                
+                // 如果还没有设置自动触发，则开始每两秒自动触发
+                if (!autoFireInterval) {
+                    autoFireInterval = setInterval(function() {
+                        launchFirework();
+                    }, 2000);
+                }
             });
             
             // 添加触摸事件支持
@@ -348,9 +471,14 @@
         // 响应窗口大小变化
         window.addEventListener('resize', function() {
             const canvas = document.getElementById('fireworks');
+            const bgCanvas = document.getElementById('backgroundFireworks');
             if (canvas) {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
+            }
+            if (bgCanvas) {
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
             }
         });
     </script>
