@@ -24,8 +24,8 @@
         .flag-container {
             position: absolute;
             top: 10%;
-            left: 5%;
-            width: 90%;
+            left: 34%;
+            width: 32%;
             height: 25%;
             perspective: 600px;
             z-index: 5;
@@ -229,6 +229,8 @@
             canvas.height = window.innerHeight;
             
             return function() {
+                // 显示节日快乐大字
+                document.getElementById('festivalGreeting').style.opacity = 1;
                 // 闪光效果
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
